@@ -5,7 +5,7 @@ BranchData_URL = 'https://raw.githubusercontent.com/hazeyblu/Essmart/main/Branch
 CovidData_URL = 'https://api.covid19india.org/csv/latest/districts.csv'
 
 st.set_page_config(page_title='ESSMART vs Covid', page_icon="ESS", layout='wide', initial_sidebar_state='collapsed')
-st.markdown("<h1 style='text-align: center; color: #b4f6c3;'>Essmart Covid Response Hub</h1>",
+st.markdown("<h1 style='text-align: center; color: #c9eab8;'>Essmart Covid Response Hub</h1>",
             unsafe_allow_html=True)
 
 
