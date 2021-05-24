@@ -6,6 +6,7 @@ BranchData_URL = 'https://raw.githubusercontent.com/hazeyblu/Essmart/main/Branch
 CovidData_URL = 'https://api.covid19india.org/csv/latest/districts.csv'
 
 logo = Image.open('3Circles.png')
+logo = logo.resize((90, 30))
 st.set_page_config(page_title='ESSMART vs Covid', initial_sidebar_state='collapsed',
                    page_icon=logo,
                    layout='wide')
@@ -25,7 +26,6 @@ def load_data(branch_data=False, districts_list=None):
     else:
         data = pd.read_csv(CovidData_URL)
         needed_data = data[data['District'].isin(districts_list)]
-        print(needed_data.columns)
         return needed_data
 
 
@@ -51,7 +51,7 @@ if radio_input == 'All':
 else:
     pre_select = False
 
-c1, c2, c3, c4 = st.beta_columns((1, 1, 2, 2))
+c1, c2, c3 = st.beta_columns((1, 1, 2))
 
 c1.markdown("<h3 style='text-align: center; color: #39A275;'>State Level Information</h3>",
             unsafe_allow_html=True)
