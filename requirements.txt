@@ -1,0 +1,8 @@
+#
+####### Streamlit requirements.txt #######
+#
+###### Requirements without Version Specifiers ######
+pandas
+streamlit
+watchdog
+#
