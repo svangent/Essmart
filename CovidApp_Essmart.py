@@ -72,6 +72,22 @@ def extract_info(dataset):
     return c, r, d, t
 
 
+def extract_detailed_info(dataset, district):
+    shortened_dataset = pd.DataFrame()
+    for districts in dataset.District.unique():
+        sub_set = dataset[dataset['District'] == districts]
+        sub_set = sub_set.iloc[-30::]
+        shortened_dataset = pd.concat([shortened_dataset, sub_set])
+    shortened_dataset.reset_index(drop=True, inplace=True)
+
+    district_metrics = shortened_dataset[shortened_dataset['District'] == district]
+    d7 = district_metrics['7D'].iloc[-1]
+    d14 = district_metrics['14D'].iloc[-1]
+    d21 = district_metrics['21D'].iloc[-1]
+    d28 = district_metrics['28D'].iloc[-1]
+    return d7, d14, d21, d28, district_metrics
+
+
 def main_layout():
     branch_details, interested_districts = load_data(branch_data=True)
 
@@ -112,19 +128,21 @@ def main_layout():
         if c2.checkbox(branch, value=pre_select):
             district_list.append(district)
             branch_list.append(branch)
-    district_list = list(set(district_list))
-    district_shorter_list = state_short_data[state_short_data.District.isin(district_list)]
-    c, r, d, t = extract_info(district_shorter_list)
+    district_list = sorted(list(set(district_list)))
+    district_shorter_data = state_short_data[state_short_data.District.isin(district_list)]
+    c, r, d, t = extract_info(district_shorter_data)
+    analysis_layout(district_shorter_data, district_list)
 
     # """
     # -----------------------
     # Main Layout Column 3
     # -----------------------
     # """
-    c3.markdown("<h3 style='text-align: center; color: #39A275;'>Districts covered</h3>",
-                unsafe_allow_html=True)
-    c3_data = branch_short_list[branch_short_list.Branch.isin(branch_list)]
-    if len(c3_data):
+    c3.empty()
+    if len(branch_list):
+        c3.markdown("<h3 style='text-align: center; color: #39A275;'>Districts covered</h3>",
+                    unsafe_allow_html=True)
+        c3_data = branch_short_list[branch_short_list.Branch.isin(branch_list)]
         c3.table(c3_data)
 
     # """
@@ -132,22 +150,105 @@ def main_layout():
     # Main Layout Column 4
     # -----------------------
     # """
-    c4.markdown("<h3 style='text-align: center; color: #39A275;'>Combined Statistics</h3>",
-                unsafe_allow_html=True)
-    table_data = pd.DataFrame([["Confirmed", c], ["Recovered", r], ["Deceased", d], ["Tested", t]])
-    table_data.columns = [['Item', 'Total']]
-    if len(c3_data):
+    c4.empty()
+    if len(branch_list):
+        c4.markdown("<h3 style='text-align: center; color: #39A275;'>Combined Statistics</h3>",
+                    unsafe_allow_html=True)
+        table_data = pd.DataFrame([["Confirmed", c], ["Recovered", r], ["Deceased", d], ["Tested", t]])
+        table_data.columns = [['Item', 'Total']]
         c4.table(table_data)
-        c4.markdown("<h6 style='text-align: right; color: #39A275;"
-                    "'><strong>Note:</strong> total reported numbers since first case</h6>",
+        c4.caption("*Reported Numbers since March 2020")
+
+
+def analysis_layout(district_shorter_data, district_list):
+    st.markdown("---")
+    if district_list:
+        st.markdown("<h2 style='text-align: center; color: #39A275;'>Analysis</h2>",
+                    unsafe_allow_html=True)
+        c1, c2, c3 = st.beta_columns((1, 3, 1))
+        # """
+        # -----------------------
+        # Analysis Layout Column 1
+        # -----------------------
+        # """
+        c1.markdown("<h3 style='text-align: center; color: #39A275;'>District Selection</h3>",
+                    unsafe_allow_html=True)
+        district_detailed = c1.radio(label="Deep Dive", options=district_list, index=0,
+                                     help="Select district (refer to branch details above) to see historical details")
+        windows = [7, 14, 21, 28]
+        columns = []
+        c1.markdown("<h4 style='text-align: center; color: #39A275;'>Average New Cases for Graph</h4>",
+                    unsafe_allow_html=True)
+        for window in windows:
+            if c1.checkbox(f'{window} days', True):
+                columns.append(f'{window}D')
+        d7, d14, d21, d28, metrics = extract_detailed_info(district_shorter_data, district_detailed)
+        # """
+        # -----------------------
+        # Analysis Layout Column 2
+        # -----------------------
+        # """
+        c2.markdown("<h3 style='text-align: center; color: #39A275;'>Historical Graph</h3>",
+                    unsafe_allow_html=True)
+        metrics = metrics[columns]
+        c2.line_chart(metrics, use_container_width=True)
+        crossovers_truth = ['🔴', '🔴', '🔴', '🔴', '🔴', '🔴']
+
+        labels = ['7 Day', '14 Day', '21 Day', '28 Day']
+        values = [d7, d14, d21, d28]
+
+        significance_count = 0
+        if d7 < d14:
+            crossovers_truth[0] = '🟢'
+            significance_count += 0.2
+        if d7 < d21:
+            crossovers_truth[1] = '🟢'
+            significance_count += 0.2
+        if d7 < d28:
+            crossovers_truth[2] = '🟢'
+            significance_count += 0.3
+        if d14 < d21:
+            crossovers_truth[3] = '🟢'
+            significance_count += 0.3
+        if d14 < d28:
+            crossovers_truth[4] = '🟢'
+            significance_count += 0.5
+        if d21 < d28:
+            crossovers_truth[5] = '🟢'
+            significance_count += 1
+
+        expander = c2.beta_expander(label="Crossover Event Checks")
+        explanation = ["7 Day Average Crosses 14 Day Average, signalling short term improvement",
+                       "7 Day Average Crosses 21 Day Average, signalling short term improvement",
+                       "7 Day Average Crosses 28 Day Average, signalling short term improvement",
+                       "14 Day Average Crosses 21 Day Average, signalling medium term improvement",
+                       "14 Day Average Crosses 28 Day Average, signalling medium term improvement",
+                       "21 Day Average Crosses 28 Day Average, signalling long term improvement"]
+        explanation_data = pd.DataFrame(columns=['Description', 'Status'])
+        explanation_data['Description'] = explanation
+        explanation_data['Status'] = crossovers_truth
+        expander.table(explanation_data)
+        # """
+        # -----------------------
+        # Analysis Layout Column 3
+        # -----------------------
+        # """
+        c3.markdown("<h3 style='text-align: center; color: #39A275;'>Current Condition</h3>",
                     unsafe_allow_html=True)
 
+        if significance_count <= 1.5:
+            c3.markdown("<h1 style='text-align: center;'>🔴</h1>",
+                        unsafe_allow_html=True)
+        elif significance_count <= 2.1:
+            c3.markdown("<h1 style='text-align: center;'>🌕</h1>",
+                        unsafe_allow_html=True)
+        elif significance_count > 2.1:
+            c3.markdown("<h1 style='text-align: center;'>🟢</h1>",
+                        unsafe_allow_html=True)
 
-def analysis_layout():
-    st.markdown("---")
-    st.markdown("<h2 style='text-align: center; color: #39A275;'>Analysis</h2>",
-                unsafe_allow_html=True)
+        display_data = pd.DataFrame(values, index=labels, columns=['Average Cases'])
+        display_data = round(display_data)
+        c3.table(display_data)
 
 
 main_layout()
-# analysis_layout()
