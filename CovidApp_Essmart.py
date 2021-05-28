@@ -163,7 +163,7 @@ def main_layout():
 def analysis_layout(district_shorter_data, district_list):
     st.markdown("---")
     if district_list:
-        st.markdown("<h2 style='text-align: center; color: #39A275;'>Analysis</h2>",
+        st.markdown("<h2 style='text-align: center; color: #39A275;'><Strong>Analysis</Strong></h2>",
                     unsafe_allow_html=True)
         c1, c2, c3 = st.beta_columns((1, 3, 1))
         # """
