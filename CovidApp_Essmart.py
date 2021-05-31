@@ -190,10 +190,11 @@ def analysis_layout(district_shorter_data, district_list):
         # """
         c2.markdown("<h3 style='text-align: center; color: #39A275;'>Historical Graph</h3>",
                     unsafe_allow_html=True)
-        days = c2.slider(label="Days", min_value=1, max_value=30, value=20)
+        days = 20
         metrics = metrics.iloc[-days::]
         metrics = metrics[columns]
         c2.line_chart(metrics, use_container_width=True)
+        days = c2.slider(label="Days", min_value=1, max_value=30, value=20)
         crossovers_truth = ['🔴', '🔴', '🔴', '🔴', '🔴', '🔴']
 
         labels = ['7 Day', '14 Day', '21 Day', '28 Day']
