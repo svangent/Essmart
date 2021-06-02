@@ -57,7 +57,6 @@ def load_data(branch_data=False, districts_list=None):
         data = pd.read_csv(CovidData_URL)
         needed_data = data[data['District'].isin(districts_list)]
         needed_data = data_wrangle(needed_data)
-        print(needed_data.columns)
         return needed_data
 
 
@@ -81,11 +80,12 @@ def extract_detailed_info(dataset, district):
     shortened_dataset.reset_index(drop=True, inplace=True)
 
     district_metrics = shortened_dataset[shortened_dataset['District'] == district]
+    d1 = district_metrics['NewCases'].iloc[-1]
     d7 = district_metrics['7D'].iloc[-1]
     d14 = district_metrics['14D'].iloc[-1]
     d21 = district_metrics['21D'].iloc[-1]
     d28 = district_metrics['28D'].iloc[-1]
-    return d7, d14, d21, d28, district_metrics
+    return d1, d7, d14, d21, d28, district_metrics
 
 
 def main_layout():
@@ -182,7 +182,7 @@ def analysis_layout(district_shorter_data, district_list):
         for window in windows:
             if c1.checkbox(f'{window} days', True):
                 columns.append(f'{window}D')
-        d7, d14, d21, d28, metrics = extract_detailed_info(district_shorter_data, district_detailed)
+        d1, d7, d14, d21, d28, metrics = extract_detailed_info(district_shorter_data, district_detailed)
         # """
         # -----------------------
         # Analysis Layout Column 2
@@ -194,33 +194,44 @@ def analysis_layout(district_shorter_data, district_list):
         metrics = metrics.iloc[-days::]
         metrics = metrics[columns]
         c2.line_chart(metrics, use_container_width=True)
-        crossovers_truth = ['🔴', '🔴', '🔴', '🔴', '🔴', '🔴', '🔴']
+        crossovers_truth = ['🔴', '🔴', '🔴', '🔴', '🔴', '🔴', '🔴', '🔴']
 
-        labels = ['7 Day', '14 Day', '21 Day', '28 Day']
-        values = [d7, d14, d21, d28]
+        labels = ['Last Day', '7 Day', '14 Day', '21 Day', '28 Day']
+        values = [d1, d7, d14, d21, d28]
 
-        significance_count = 0
+        significance_count, short_term, medium_term, long_term, new_case = 0, 0, 0, 0, 0
         if d7 < d14:
             crossovers_truth[0] = '🟢'
             significance_count += 1
+            short_term += 1
         if d7 < d21:
             crossovers_truth[1] = '🟢'
             significance_count += 1
+            short_term += 1
         if d7 < d28:
             crossovers_truth[2] = '🟢'
             significance_count += 1
+            short_term += 1
         if d14 < d21:
             crossovers_truth[3] = '🟢'
             significance_count += 1
+            medium_term += 1
         if d14 < d28:
             crossovers_truth[4] = '🟢'
             significance_count += 1
+            medium_term += 1
         if d21 < d28:
             crossovers_truth[5] = '🟢'
             significance_count += 1
+            long_term += 1
         if d7 < 1000:
             crossovers_truth[6] = '🟢'
             significance_count += 1
+            new_case += 1
+        if d1 == 0:
+            crossovers_truth[7] = '🟢'
+            significance_count += 1
+            new_case += 1
 
         expander = c2.beta_expander(label="Crossover Event Checks")
         explanation = ["7 Day Average Crosses 14 Day Average, signalling short term improvement",
@@ -229,7 +240,8 @@ def analysis_layout(district_shorter_data, district_list):
                        "14 Day Average Crosses 21 Day Average, signalling medium term improvement",
                        "14 Day Average Crosses 28 Day Average, signalling medium term improvement",
                        "21 Day Average Crosses 28 Day Average, signalling long term improvement",
-                       "Weekly New Cases are below 1000"]
+                       "7 Day Average New Cases are below 1000",
+                       "No New Cases Recorded in the Previous Day"]
         explanation_data = pd.DataFrame(columns=['Description', 'Status'])
         explanation_data['Description'] = explanation
         explanation_data['Status'] = crossovers_truth
@@ -245,14 +257,14 @@ def analysis_layout(district_shorter_data, district_list):
         if significance_count < 4:
             c3.markdown("<h1 style='text-align: center;'>🔴</h1>",
                         unsafe_allow_html=True)
-        elif significance_count < 7:
+        elif significance_count <= 7:
             c3.markdown("<h1 style='text-align: center;'>🌕</h1>",
                         unsafe_allow_html=True)
-        elif significance_count == 7:
+        elif significance_count == 8:
             c3.markdown("<h1 style='text-align: center;'>🟢</h1>",
                         unsafe_allow_html=True)
 
-        display_data = pd.DataFrame(values, index=labels, columns=['Average Cases'])
+        display_data = pd.DataFrame(values, index=labels, columns=['Average New Cases'])
         display_data = round(display_data)
         c3.table(display_data)
 
