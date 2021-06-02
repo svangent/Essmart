@@ -194,7 +194,7 @@ def analysis_layout(district_shorter_data, district_list):
         metrics = metrics.iloc[-days::]
         metrics = metrics[columns]
         c2.line_chart(metrics, use_container_width=True)
-        crossovers_truth = ['🔴', '🔴', '🔴', '🔴', '🔴', '🔴']
+        crossovers_truth = ['🔴', '🔴', '🔴', '🔴', '🔴', '🔴', '🔴']
 
         labels = ['7 Day', '14 Day', '21 Day', '28 Day']
         values = [d7, d14, d21, d28]
@@ -202,21 +202,24 @@ def analysis_layout(district_shorter_data, district_list):
         significance_count = 0
         if d7 < d14:
             crossovers_truth[0] = '🟢'
-            significance_count += 0.2
+            significance_count += 1
         if d7 < d21:
             crossovers_truth[1] = '🟢'
-            significance_count += 0.2
+            significance_count += 1
         if d7 < d28:
             crossovers_truth[2] = '🟢'
-            significance_count += 0.3
+            significance_count += 1
         if d14 < d21:
             crossovers_truth[3] = '🟢'
-            significance_count += 0.3
+            significance_count += 1
         if d14 < d28:
             crossovers_truth[4] = '🟢'
-            significance_count += 0.5
+            significance_count += 1
         if d21 < d28:
             crossovers_truth[5] = '🟢'
+            significance_count += 1
+        if d7 < 1000:
+            crossovers_truth[6] = '🟢'
             significance_count += 1
 
         expander = c2.beta_expander(label="Crossover Event Checks")
@@ -225,7 +228,8 @@ def analysis_layout(district_shorter_data, district_list):
                        "7 Day Average Crosses 28 Day Average, signalling short term improvement",
                        "14 Day Average Crosses 21 Day Average, signalling medium term improvement",
                        "14 Day Average Crosses 28 Day Average, signalling medium term improvement",
-                       "21 Day Average Crosses 28 Day Average, signalling long term improvement"]
+                       "21 Day Average Crosses 28 Day Average, signalling long term improvement",
+                       "Weekly New Cases are below 1000"]
         explanation_data = pd.DataFrame(columns=['Description', 'Status'])
         explanation_data['Description'] = explanation
         explanation_data['Status'] = crossovers_truth
@@ -238,13 +242,13 @@ def analysis_layout(district_shorter_data, district_list):
         c3.markdown("<h3 style='text-align: center; color: #39A275;'>Current Condition</h3>",
                     unsafe_allow_html=True)
 
-        if significance_count < 1.5:
+        if significance_count < 4:
             c3.markdown("<h1 style='text-align: center;'>🔴</h1>",
                         unsafe_allow_html=True)
-        elif significance_count <= 2.1:
+        elif significance_count < 7:
             c3.markdown("<h1 style='text-align: center;'>🌕</h1>",
                         unsafe_allow_html=True)
-        elif significance_count > 2.1:
+        elif significance_count == 7:
             c3.markdown("<h1 style='text-align: center;'>🟢</h1>",
                         unsafe_allow_html=True)
 
