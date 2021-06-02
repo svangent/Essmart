@@ -194,54 +194,60 @@ def analysis_layout(district_shorter_data, district_list):
         metrics = metrics.iloc[-days::]
         metrics = metrics[columns]
         c2.line_chart(metrics, use_container_width=True)
-        crossovers_truth = ['🔴', '🔴', '🔴', '🔴', '🔴', '🔴', '🔴', '🔴']
+        crossovers_truth = ['🔴', '🔴', '🔴', '🔴']
 
         labels = ['Last Day', '7 Day', '14 Day', '21 Day', '28 Day']
         values = [d1, d7, d14, d21, d28]
 
         significance_count, short_term, medium_term, long_term, new_case = 0, 0, 0, 0, 0
         if d7 < d14:
-            crossovers_truth[0] = '🟢'
             significance_count += 1
             short_term += 1
         if d7 < d21:
-            crossovers_truth[1] = '🟢'
             significance_count += 1
             short_term += 1
         if d7 < d28:
-            crossovers_truth[2] = '🟢'
             significance_count += 1
             short_term += 1
         if d14 < d21:
-            crossovers_truth[3] = '🟢'
             significance_count += 1
             medium_term += 1
         if d14 < d28:
-            crossovers_truth[4] = '🟢'
             significance_count += 1
             medium_term += 1
         if d21 < d28:
-            crossovers_truth[5] = '🟢'
             significance_count += 1
             long_term += 1
         if d7 < 1000:
-            crossovers_truth[6] = '🟢'
             significance_count += 1
             new_case += 1
         if d1 == 0:
-            crossovers_truth[7] = '🟢'
             significance_count += 1
             new_case += 1
 
+        if 3 > short_term > 1:
+            crossovers_truth[0] = '🌕'
+        elif short_term == 3:
+            crossovers_truth[0] = '🟢'
+
+        if medium_term == 1:
+            crossovers_truth[1] = '🌕'
+        elif medium_term == 2:
+            crossovers_truth[1] = '🟢'
+
+        if long_term == 1:
+            crossovers_truth[2] = '🟢'
+
+        if new_case == 1:
+            crossovers_truth[3] = '🌕'
+        elif new_case == 2:
+            crossovers_truth[3] = '🟢'
+
         expander = c2.beta_expander(label="Crossover Event Checks")
-        explanation = ["7 Day Average Crosses 14 Day Average, signalling short term improvement",
-                       "7 Day Average Crosses 21 Day Average, signalling short term improvement",
-                       "7 Day Average Crosses 28 Day Average, signalling short term improvement",
-                       "14 Day Average Crosses 21 Day Average, signalling medium term improvement",
-                       "14 Day Average Crosses 28 Day Average, signalling medium term improvement",
-                       "21 Day Average Crosses 28 Day Average, signalling long term improvement",
-                       "7 Day Average New Cases are below 1000",
-                       "No New Cases Recorded in the Previous Day"]
+        explanation = ["Short Term Outlook",
+                       "Medium Term Outlook",
+                       "Long Term Outlook",
+                       "New Cases Outlook"]
         explanation_data = pd.DataFrame(columns=['Description', 'Status'])
         explanation_data['Description'] = explanation
         explanation_data['Status'] = crossovers_truth
