@@ -226,12 +226,12 @@ def analysis_layout(district_shorter_data, district_list):
             new_case += 1
 
         if 3 > short_term > 1:
-            crossovers_truth[0] = '🌕'
+            crossovers_truth[0] = '🟡'
         elif short_term == 3:
             crossovers_truth[0] = '🟢'
 
         if medium_term == 1:
-            crossovers_truth[1] = '🌕'
+            crossovers_truth[1] = '🟡'
         elif medium_term == 2:
             crossovers_truth[1] = '🟢'
 
@@ -239,7 +239,7 @@ def analysis_layout(district_shorter_data, district_list):
             crossovers_truth[2] = '🟢'
 
         if new_case == 1:
-            crossovers_truth[3] = '🌕'
+            crossovers_truth[3] = '🟡'
         elif new_case == 2:
             crossovers_truth[3] = '🟢'
 
@@ -264,7 +264,7 @@ def analysis_layout(district_shorter_data, district_list):
             c3.markdown("<h1 style='text-align: center;'>🔴</h1>",
                         unsafe_allow_html=True)
         elif significance_count <= 7:
-            c3.markdown("<h1 style='text-align: center;'>🌕</h1>",
+            c3.markdown("<h1 style='text-align: center;'>🟡</h1>",
                         unsafe_allow_html=True)
         elif significance_count == 8:
             c3.markdown("<h1 style='text-align: center;'>🟢</h1>",
