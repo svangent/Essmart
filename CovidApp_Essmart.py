@@ -1,8 +1,9 @@
 import pandas as pd
 import streamlit as st
 from PIL import Image
+from datetime import date
 
-BranchData_URL = 'https://raw.githubusercontent.com/hazeyblu/Essmart/main/BranchDetails.csv'
+BranchData_URL = 'BranchDetails.csv'
 CovidData_URL = 'https://api.covid19india.org/csv/latest/districts.csv'
 
 logo = Image.open('3Circles.png').resize((90, 30))
@@ -30,6 +31,7 @@ def data_wrangle(dataset):
     for districts in dataset.District.unique():
         sub_set = dataset[dataset['District'] == districts]
         sub_set["NewCases"] = sub_set.Confirmed - sub_set.Confirmed.shift(1)
+        sub_set["NewCases"] = sub_set.Confirmed - sub_set.Confirmed.shift(2)
         for window in rolling_windows:
             sub_set[f"{window}D"] = sub_set.NewCases.rolling(window).mean()
         output_dataframe = pd.concat([output_dataframe, sub_set])
@@ -38,15 +40,18 @@ def data_wrangle(dataset):
 
 
 @st.cache(show_spinner=False, persist=True)
-def load_data(branch_data=False, districts_list=None):
+def load_data(branch_data=False, districts_list=None, date2day=date.today()):
     """
 
     Fetching and loading required data, serves dual purpose to utilize caching
 
     :param branch_data: list of Essmart branches and respective districts
     :param districts_list: list of districts to serve as filter from main dataset
+    :param date2day: passes current day, for refreshing cached data
     :return: varies based on function call
     """
+    if date2day:
+        pass
     if districts_list is None:
         districts_list = ['']
     if branch_data:
