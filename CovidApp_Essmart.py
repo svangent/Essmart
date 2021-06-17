@@ -31,7 +31,6 @@ def data_wrangle(dataset):
     for districts in dataset.District.unique():
         sub_set = dataset[dataset['District'] == districts]
         sub_set["NewCases"] = sub_set.Confirmed - sub_set.Confirmed.shift(1)
-        sub_set["NewCases"] = sub_set.Confirmed - sub_set.Confirmed.shift(2)
         for window in rolling_windows:
             sub_set[f"{window}D"] = sub_set.NewCases.rolling(window).mean()
         output_dataframe = pd.concat([output_dataframe, sub_set])
@@ -85,7 +84,8 @@ def extract_detailed_info(dataset, district):
     shortened_dataset.reset_index(drop=True, inplace=True)
 
     district_metrics = shortened_dataset[shortened_dataset['District'] == district]
-    d1 = district_metrics['NewCases'].iloc[-1]
+    d1 = district_metrics['NewCases'].iloc[-1] if district_metrics['NewCases'].iloc[-1] != 0 \
+        else district_metrics['NewCases'].iloc[-2]
     d7 = district_metrics['7D'].iloc[-1]
     d14 = district_metrics['14D'].iloc[-1]
     d21 = district_metrics['21D'].iloc[-1]
@@ -197,6 +197,7 @@ def analysis_layout(district_shorter_data, district_list):
                     unsafe_allow_html=True)
         days = c2.slider(label="Days", min_value=1, max_value=30, value=20)
         metrics = metrics.iloc[-days::]
+        metrics.reset_index(drop=True, inplace=True)
         metrics = metrics[columns]
         c2.line_chart(metrics, use_container_width=True)
         crossovers_truth = ['🔴', '🔴', '🔴', '🔴']
