@@ -98,7 +98,7 @@ def main_layout():
 
     truncated_data = load_data(districts_list=interested_districts)
 
-    c1, c2, c3, c4 = st.beta_columns((1, 1, 1, 1))
+    c1, c2, c3, c4 = st.columns((1, 1, 1, 1))
 
     # """
     # -----------------------
@@ -170,7 +170,7 @@ def analysis_layout(district_shorter_data, district_list):
     if district_list:
         st.markdown("<h2 style='text-align: center; color: #39A275;'><Strong>Analysis</Strong></h2>",
                     unsafe_allow_html=True)
-        c1, c2, c3 = st.beta_columns((1, 3, 1))
+        c1, c2, c3 = st.columns((1, 3, 1))
         # """
         # -----------------------
         # Analysis Layout Column 1
@@ -181,7 +181,7 @@ def analysis_layout(district_shorter_data, district_list):
         district_detailed = c1.radio(label="Deep Dive", options=district_list, index=0,
                                      help="Select district (refer to branch details above) to see historical details")
         windows = [7, 14, 21, 28]
-        columns = ['NewCases']
+        columns = []
         c1.markdown("<h4 style='text-align: center; color: #39A275;'>Average New Cases for Graph</h4>",
                     unsafe_allow_html=True)
         for window in windows:
@@ -227,7 +227,7 @@ def analysis_layout(district_shorter_data, district_list):
         if d7 < 1000:
             significance_count += 1
             new_case += 1
-        if d1 < 100:
+        if d1 == 0:
             significance_count += 1
             new_case += 1
 
@@ -249,7 +249,7 @@ def analysis_layout(district_shorter_data, district_list):
         elif new_case == 2:
             crossovers_truth[3] = '🟢'
 
-        expander = c2.beta_expander(label="Crossover Event Checks")
+        expander = c2.expander(label="Crossover Event Checks")
         explanation = ["Short Term Outlook",
                        "Medium Term Outlook",
                        "Long Term Outlook",
