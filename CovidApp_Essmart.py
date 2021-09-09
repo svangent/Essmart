@@ -10,7 +10,7 @@ logo = Image.open('3Circles.png').resize((90, 30))
 st.set_page_config(page_title='ESSMART vs Covid', initial_sidebar_state='collapsed',
                    page_icon=logo,
                    layout='wide')
-col1, col2, col3 = st.beta_columns((1, 3, 1))
+col1, col2, col3 = st.columns((1, 3, 1))
 col1.image(logo)
 col2.markdown("<h1 style='text-align: center; color: #39A275;'>Essmart Covid Tracker</h1>",
               unsafe_allow_html=True)
