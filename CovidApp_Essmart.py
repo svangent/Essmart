@@ -227,7 +227,7 @@ def analysis_layout(district_shorter_data, district_list):
         if d7 < 1000:
             significance_count += 1
             new_case += 1
-        if d1 < 100:
+        if d1 <= d7:
             significance_count += 1
             new_case += 1
 
