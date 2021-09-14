@@ -181,7 +181,7 @@ def analysis_layout(district_shorter_data, district_list):
         district_detailed = c1.radio(label="Deep Dive", options=district_list, index=0,
                                      help="Select district (refer to branch details above) to see historical details")
         windows = [7, 14, 21, 28]
-        columns = []
+        columns = ['NewCases']
         c1.markdown("<h4 style='text-align: center; color: #39A275;'>Average New Cases for Graph</h4>",
                     unsafe_allow_html=True)
         for window in windows:
