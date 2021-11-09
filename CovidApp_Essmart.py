@@ -135,7 +135,7 @@ def main_layout():
     # """
     c1.markdown("<h3 style='text-align: center; color: #39A275;'>State Level Information</h3>",
                 unsafe_allow_html=True)
-    selected_state = c1.selectbox("State level information:", ('Karnataka', 'Andhra Pradesh', 'Tamil Nadu'))
+    selected_state = c1.selectbox("State level information:", ('Karnataka', 'Andhra Pradesh', 'Tamil Nadu', 'Bihar'))
     radio_input = c1.radio(label='Branch Select Default:',
                            options=('All', 'None'),
                            index=1,
