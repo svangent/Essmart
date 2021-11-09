@@ -4,16 +4,25 @@ from PIL import Image
 from datetime import date
 
 BranchData_URL = 'BranchDetails.csv'
+"""
+Update this file to include new branches.
+Cross check with data from CovidData_URL to include correct spelling of town / district
+"""
 CovidData_URL = 'https://api.covid19india.org/csv/latest/districts.csv'
 
 logo = Image.open('3Circles.png').resize((90, 30))
+# Generic Essmart Logo, maybe replaced as required
 st.set_page_config(page_title='ESSMART vs Covid', initial_sidebar_state='collapsed',
                    page_icon=logo,
                    layout='wide')
 col1, col2, col3 = st.columns((1, 3, 1))
+"""
+st.columns((x,y,z)) creates a structure with three columns, in a ratio of x:y:z in width
+"""
 col1.image(logo)
 col2.markdown("<h1 style='text-align: center; color: #39A275;'>Essmart Covid Tracker</h1>",
               unsafe_allow_html=True)
+# unsafe_allow_html parameter is to override default streamlit behaviour to block HTML formatting
 col3.empty()
 
 
@@ -22,6 +31,9 @@ def data_wrangle(dataset):
     """
 
     Main part of analysis where trends are studied
+
+    Cache is used to enable data persistence on browser, for faster operations
+    It is also being used to hide the loading bar (spinner)
 
     :param dataset: mutated dataset consisting of data only for interested districts
     :return: modified dataset with rolling average calculation
@@ -65,6 +77,13 @@ def load_data(branch_data=False, districts_list=None, date2day=date.today()):
 
 
 def extract_info(dataset):
+    """
+
+    Finding the last entry of all case statistics to show on the details table
+
+    :param dataset: mutated dataset consisting of data only for interested districts
+    :return: NULL
+    """
     c, r, d, t = 0, 0, 0, 0
     for districts in dataset.District.unique():
         sub_set = dataset[dataset['District'] == districts]
@@ -76,6 +95,13 @@ def extract_info(dataset):
 
 
 def extract_detailed_info(dataset, district):
+    """
+    Function to find the last day statistics for given district
+
+    :param dataset: API data set truncated to include only interested branches
+    :param district: interested district as per selection on site
+    :return: return last day statistics for selected branch, and last 30 day statistics for other operations
+    """
     shortened_dataset = pd.DataFrame()
     for districts in dataset.District.unique():
         sub_set = dataset[dataset['District'] == districts]
@@ -94,6 +120,11 @@ def extract_detailed_info(dataset, district):
 
 
 def main_layout():
+    # """
+    # ----------------------------------------------------
+    # This is where we define the layout of our web portal
+    # ----------------------------------------------------
+    # """
     branch_details, interested_districts = load_data(branch_data=True)
 
     truncated_data = load_data(districts_list=interested_districts)
@@ -166,6 +197,14 @@ def main_layout():
 
 
 def analysis_layout(district_shorter_data, district_list):
+    """
+    This is where we define the layout of the detailed analysis window
+    This would show only when a district is selected on the main layout
+
+    :param district_shorter_data: data of interested districts from main layout
+    :param district_list: list of districts from main layout to create checkbox
+    :return: NULL
+    """
     st.markdown("---")
     if district_list:
         st.markdown("<h2 style='text-align: center; color: #39A275;'><Strong>Analysis</Strong></h2>",
@@ -282,3 +321,4 @@ def analysis_layout(district_shorter_data, district_list):
 
 
 main_layout()
+
