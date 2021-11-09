@@ -1,25 +1,22 @@
 import pandas as pd
 import streamlit as st
-from PIL import Image
 from datetime import date
 
-BranchData_URL = 'BranchDetails.csv'
-"""
-Update this file to include new branches.
-Cross check with data from CovidData_URL to include correct spelling of town / district
-"""
-CovidData_URL = 'https://api.covid19india.org/csv/latest/districts.csv'
-
-logo = Image.open('3Circles.png').resize((90, 30))
-# Generic Essmart Logo, maybe replaced as required
 st.set_page_config(page_title='ESSMART vs Covid', initial_sidebar_state='collapsed',
-                   page_icon=logo,
                    layout='wide')
 col1, col2, col3 = st.columns((1, 3, 1))
-"""
-st.columns((x,y,z)) creates a structure with three columns, in a ratio of x:y:z in width
-"""
-col1.image(logo)
+BranchData_URL = 'https://bitbucket.org/vinay_28/essmart-covid-monitoring/raw/' \
+                 '760484384e31c99724a723862bfd2f47e0b3c04a/BranchDetails.csv'
+# """
+# Update this file to include new branches.
+# Cross check with data from CovidData_URL to include correct spelling of town / district
+# """
+CovidData_URL = 'https://api.covid19india.org/csv/latest/districts.csv'
+
+# """
+# st.columns((x,y,z)) creates a structure with three columns, in a ratio of x:y:z in width
+# """
+col1.empty()
 col2.markdown("<h1 style='text-align: center; color: #39A275;'>Essmart Covid Tracker</h1>",
               unsafe_allow_html=True)
 # unsafe_allow_html parameter is to override default streamlit behaviour to block HTML formatting
@@ -321,4 +318,3 @@ def analysis_layout(district_shorter_data, district_list):
 
 
 main_layout()
-
