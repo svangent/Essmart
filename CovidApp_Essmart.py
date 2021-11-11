@@ -241,6 +241,14 @@ def analysis_layout(district_shorter_data, district_list):
         values = [d1, d7, d14, d21, d28]
 
         significance_count, short_term, medium_term, long_term, new_case = 0, 0, 0, 0, 0
+        """
+        The scoring mechanism is thus. Higher score is better.
+        0 in significance count denotes areas with high risk.
+        8 in significance count denotes areas with low risk.
+        
+        A score is calculated to identify short, medium and long term significance as well.
+        The score is dependent on the number of shorter period crossovers
+        """
         if d7 < d14:
             significance_count += 1
             short_term += 1
