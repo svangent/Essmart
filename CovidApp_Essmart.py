@@ -5,8 +5,7 @@ from datetime import date
 st.set_page_config(page_title='ESSMART vs Covid', initial_sidebar_state='collapsed',
                    layout='wide')
 col1, col2, col3 = st.columns((1, 3, 1))
-BranchData_URL = 'https://bitbucket.org/vinay_28/essmart-covid-monitoring/raw/' \
-                 '760484384e31c99724a723862bfd2f47e0b3c04a/BranchDetails.csv'
+BranchData_URL = 'BranchDetails.csv'
 # """
 # Update this file to include new branches.
 # Cross check with data from CovidData_URL to include correct spelling of town / district
